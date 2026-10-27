@@ -1,0 +1,5 @@
+id,hora,servicio,nivel,senal,origen
+AZ-201,10:37,n8n-webhook,Severa,Tiempo de respuesta sobre 2.5 s,Application Insights
+AZ-202,10:52,db-operaciones,Advertencia,Conexiones activas al 78%,Azure Monitor
+AZ-203,11:24,api-operaciones,Informativa,3 respuestas 429 en 5 min,Log Analytics
+AZ-204,12:06,storage-archivos,Advertencia,Aumento de latencia de lectura,Azure Monitor

@@ -1,0 +1,13 @@
+id,fecha,region,estado,responsable,servicio,horas,sla,importe_ars
+OP-1042,2026-10-27 09:12,CABA,Demorada,Equipo A,n8n-webhook,5.4,4,182000
+OP-1043,2026-10-27 09:40,Norte,En curso,Equipo B,api-operaciones,1.3,4,92000
+OP-1044,2026-10-27 10:05,Sur,En riesgo,Equipo C,db-operaciones,3.8,4,245000
+OP-1045,2026-10-27 10:21,CABA,Completada,Equipo A,api-operaciones,2.1,4,76000
+OP-1046,2026-10-27 10:49,Norte,Demorada,Equipo D,n8n-webhook,7.2,4,131000
+OP-1047,2026-10-27 11:02,Sur,En curso,Equipo B,storage-archivos,0.8,6,68000
+OP-1048,2026-10-27 11:16,CABA,Demorada,Equipo C,db-operaciones,8.1,4,317000
+OP-1049,2026-10-27 11:45,Norte,Completada,Equipo A,api-operaciones,1.9,4,114000
+OP-1050,2026-10-27 12:03,Sur,En riesgo,Equipo D,n8n-webhook,3.6,4,205000
+OP-1051,2026-10-27 12:22,CABA,En curso,Equipo B,storage-archivos,2.6,6,157000
+OP-1052,2026-10-27 12:48,Norte,Demorada,Equipo C,db-operaciones,6.5,4,89000
+OP-1053,2026-10-27 13:10,Sur,Completada,Equipo A,api-operaciones,2.4,4,143000
