@@ -93,9 +93,9 @@ export default function VmN8nGuide() {
 
   return <section className="vm-n8n-guide" aria-label="Guía para instalar n8n en una Azure Virtual Machine">
     <header className="vm-guide-hero">
-      <div className="eyebrow"><span className="eyebrow-line" /> MÓDULO 02 / ARMAR UN n8n AUTOGESTIONADO</div>
-      <h1>De una VM vacía<br /><em>a un n8n accesible.</em></h1>
-      <p>Recorrido de aprendizaje en Azure Portal y Linux: crear la máquina, proteger puertos, instalar Docker Compose y configurar dominio, HTTPS y almacenamiento persistente.</p>
+      <div className="eyebrow"><span className="eyebrow-line" /> OPCIONAL / ALOJAR n8n EN AZURE</div>
+      <h1>Si necesitás alojar<br /><em>tu propio n8n.</em></h1>
+      <p>Este recorrido es solo para autohospedar una instancia nueva. No es requisito para conectar n8n Cloud ni para completar los cuatro objetivos principales.</p>
     </header>
 
     <div className="vm-guide-note"><b>ALCANCE DEL EJERCICIO</b><span>Es un despliegue guiado de laboratorio; crear Azure Virtual Machines, discos, IP pública, Azure Bastion, backups u observabilidad puede generar cargos. Aquí no se crea ni modifica ningún recurso.</span></div>

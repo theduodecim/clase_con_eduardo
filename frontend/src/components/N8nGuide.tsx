@@ -81,7 +81,7 @@ export default function N8nGuide() {
   return <section className="n8n-guide" aria-label="Guía paso a paso del workflow n8n">
     <header className="n8n-guide-header">
       <div><span className="micro-label">RECORRIDO GUIADO · 4 PASOS</span><h2>Qué hace cada nodo y cómo llega el dato</h2></div>
-      <p>Seguimos la solicitud de entrada hasta el JSON de salida. Las conexiones Azure de este diagrama son opciones para la práctica real; el simulador usa archivos locales.</p>
+      <p>El workflow importable usa un Code node con las tablas ficticias. Si después conectamos datos reales, elegimos Microsoft SQL, Azure Storage o HTTP Request según la fuente.</p>
     </header>
 
     <div className="n8n-guide-layout">
@@ -105,6 +105,6 @@ export default function N8nGuide() {
         <div className="source-links">{step.sources.map((source) => <a href={source.href} key={source.href} target="_blank" rel="noreferrer">{source.label} ↗</a>)}</div>
       </article>
     </div>
-    <p className="n8n-guide-footnote">Regla para recordar: Webhook recibe; un nodo de fuente lee; Filter / IF / Aggregate transforman; Respond to Webhook devuelve. En una práctica real, la cuenta, el esquema, las credenciales y la red de Eduardo determinan la configuración concreta.</p>
+    <p className="n8n-guide-footnote">Regla para recordar: Webhook recibe; el Code node procesa esta muestra; Respond to Webhook devuelve. Al pasar a datos reales, la cuenta, el esquema, las credenciales y la red de Eduardo determinan qué nodos se agregan.</p>
   </section>;
 }

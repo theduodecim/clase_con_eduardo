@@ -6,6 +6,12 @@ Cada ejecución recibe criterios para revisar la tabla ficticia de operaciones y
 
 ## Nodos para armar en clase
 
+Hay un workflow de muestra importable en [`frontend/public/workflows/torre-control-demo.json`](../frontend/public/workflows/torre-control-demo.json). En n8n, usar **Import from File**, seleccionar ese archivo y mantener el workflow inactivo mientras se prueba. El Code node contiene las mismas 12 operaciones y 4 alertas ficticias de `frontend/src/data/demo.ts`; no necesita credenciales ni consulta Azure.
+
+Para probar, abrir el nodo **Webhook**, pulsar **Listen for test event** y enviar un `POST` JSON a la Test URL que muestra la instancia. El path configurado es `eduardo/torre-demo`. La guía de conexión también permite pegar esa URL para enviar los filtros de ejemplo desde el navegador. La URL de producción no forma parte del ejercicio. Antes de activar o exponer un webhook, configurar autenticación o una restricción de acceso adecuada.
+
+El archivo de demostración tiene tres nodos: **Webhook → Code → Respond to Webhook**. La siguiente lista explica cómo evolucionar ese caso si se reemplazan las tablas internas por una fuente real; no significa que el archivo de demo ya tenga credenciales o nodos Azure configurados.
+
 1. **Webhook** — trigger de entrada, método `POST`, path `/eduardo/torre-demo`. Recibe criterios del cliente e inicia la ejecución; no consulta Azure por sí solo. Probar primero con Test URL. La Production URL se usa cuando el workflow se publica. Configurar autenticación antes de exponer un endpoint real.
 2. **Validar entrada** — aceptar `estado` (opcional: `Todos`, `Demorada`, `En riesgo`, `En curso`, `Completada`), `region` (`Todas`, `CABA`, `Norte`, `Sur`) y un `limite` acotado. Responder `400` para valores inválidos.
 3. **Leer operaciones con el nodo de la fuente confirmada** — no son rutas intercambiables:
@@ -15,17 +21,17 @@ Cada ejecución recibe criterios para revisar la tabla ficticia de operaciones y
    - En todas las opciones, revisar autenticación y ruta de red desde donde corre n8n. Un Private Endpoint necesita conectividad y DNS; no basta con conocer la URL.
 4. **Filtrar y calcular** — los registros se procesan como items de n8n. Usar **Filter** para estado/región; convertir `horas`, `sla` e `importe_ars` a números si llegan como texto (por ejemplo, después de extraer un CSV); usar **IF** para la condición `horas > sla` y **Aggregate** para construir los totales.
 5. **Leer alertas** — consultar el segundo CSV ficticio con el método de lectura correspondiente. Agrupar por servicio/nivel; mantenerlas como señales independientes mientras no haya una llave de correlación, tiempo comparable y evidencia causal.
-6. **Respond to Webhook** — configurar el Webhook para responder usando este nodo. Devolver `200` y JSON con filtros, resumen, hasta cuatro operaciones de muestra y limitaciones. Definir también qué recibe el cliente para entrada inválida o fallo de lectura; revisar el status HTTP y el body.
+6. **Respond to Webhook** — configurar el Webhook para responder usando este nodo. Devolver `200` y JSON con filtros, resumen, operaciones y alertas de muestra y limitaciones. Definir también qué recibe el cliente para entrada inválida o fallo de lectura; revisar el status HTTP y el body.
 
 ## Request de ejemplo
 
-Este JSON es el contrato conceptual para el Webhook real que se podría construir en n8n. La interfaz local de este repo no envía ese request; aplica filtros en el navegador sobre `demo.ts`.
+Este JSON es el contrato de prueba para el Webhook del workflow importable. La interfaz local aplica los mismos filtros en el navegador sobre `demo.ts`.
 
 ```json
 {
   "estado": "Demorada",
-  "region": "Todas",
-  "limite": 50
+  "region": "Norte",
+  "limite": 4
 }
 ```
 
@@ -51,6 +57,7 @@ Este JSON es el contrato conceptual para el Webhook real que se podría construi
 - `importe_asociado_ars`: suma de los importes de las filas filtradas; no es facturación neta ni un total de Azure Cost Management.
 - `alertas_severas`: conteo del conjunto independiente de alertas. No afirma que esas alertas correspondan a las operaciones incluidas.
 - `operaciones`: hasta cuatro filas de ejemplo para inspección, no necesariamente todas las filas.
+- `alertas`: filas de muestra del conjunto independiente de señales Azure; no se correlacionan automáticamente con operaciones.
 - `alcance`: límites que el cliente de la API debería conocer.
 
 Un código HTTP 200 comunica que el request recibió una respuesta satisfactoria según el flujo; no valida que la fuente sea actual, completa o real.
@@ -60,30 +67,35 @@ Un código HTTP 200 comunica que el request recibió una respuesta satisfactoria
 ```json
 {
   "simulacion": true,
-  "filtros": { "estado": "Demorada", "region": "Todas" },
+  "filtros": { "estado": "Demorada", "region": "Norte" },
   "resumen": {
-    "registros_en_muestra": 4,
-    "fuera_de_sla": 4,
+    "registros_en_muestra": 2,
+    "fuera_de_sla": 2,
     "en_riesgo": 0,
-    "importe_asociado_ars": 719000,
+    "importe_asociado_ars": 220000,
     "alertas_azure_muestra": 4,
     "alertas_severas": 1
   },
   "operaciones": [
-    { "id": "OP-1042", "region": "CABA", "estado": "Demorada", "servicio": "n8n-webhook", "horas": 5.4, "sla": 4 },
     { "id": "OP-1046", "region": "Norte", "estado": "Demorada", "servicio": "n8n-webhook", "horas": 7.2, "sla": 4 },
-    { "id": "OP-1048", "region": "CABA", "estado": "Demorada", "servicio": "db-operaciones", "horas": 8.1, "sla": 4 },
     { "id": "OP-1052", "region": "Norte", "estado": "Demorada", "servicio": "db-operaciones", "horas": 6.5, "sla": 4 }
   ],
+  "alertas": [
+    { "id": "AZ-201", "hora": "10:37", "servicio": "n8n-webhook", "nivel": "Severa", "señal": "Tiempo de respuesta sobre 2.5 s", "origen": "Application Insights" },
+    { "id": "AZ-202", "hora": "10:52", "servicio": "db-operaciones", "nivel": "Advertencia", "señal": "Conexiones activas al 78%", "origen": "Azure Monitor" },
+    { "id": "AZ-203", "hora": "11:24", "servicio": "api-operaciones", "nivel": "Informativa", "señal": "3 respuestas 429 en 5 min", "origen": "Log Analytics" },
+    { "id": "AZ-204", "hora": "12:06", "servicio": "storage-archivos", "nivel": "Advertencia", "señal": "Aumento de latencia de lectura", "origen": "Azure Monitor" }
+  ],
   "alcance": [
-    "Se consultaron únicamente las tablas ficticias incluidas en este laboratorio.",
-    "Las alertas no se correlacionan automáticamente con cada operación.",
-    "No se consultó la instancia n8n ni ningún recurso de Azure."
+    "Solo se consultaron las tablas ficticias incluidas en este workflow.",
+    "Las alertas se muestran como una tabla independiente: no se correlacionan ni prueban la causa de una demora.",
+    "No se consultó Azure, una base real ni otra instancia n8n.",
+    "Fuera de SLA significa horas > SLA; el importe es un dato inventado, no facturación real."
   ]
 }
 ```
 
-El resultado numérico de la app interactiva es calculado desde sus datos de muestra; este ejemplo de contrato puede cambiar al armar el workflow real. No copiar tokens ni URLs privadas a este repositorio.
+La app interactiva del navegador y el workflow importable calculan sobre la misma muestra. El workflow no incluye credenciales y su webhook debe protegerse antes de publicarse. No copiar tokens ni URLs privadas a este repositorio.
 
 ## Servicios Azure si se pasa a una fuente real
 
